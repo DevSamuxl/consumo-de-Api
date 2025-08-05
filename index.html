@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Consulta de Países</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+  body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(to right, #00c9ff, #92fe9d);
+    min-height: 100vh;
+    padding: 30px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  h1 {
+    color: white;
+    font-size: 36px;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+  }
+
+  input {
+    padding: 12px 20px;
+    width: 300px;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: 0.3s ease;
+  }
+
+  input:focus {
+    outline: none;
+    box-shadow: 0 0 10px #ffffff;
+    background-color: #ffffff;
+  }
+
+  .country-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 30px 25px;
+    max-width: 450px;
+    margin: 0 auto;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    animation: fadeIn 0.6s ease-in-out;
+  }
+
+  .country-card img {
+    width: 120px;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 15px;
+  }
+
+  .country-card h2 {
+    margin: 10px 0;
+    color: #333;
+  }
+
+  .country-card p {
+    margin: 6px 0;
+    color: #555;
+    font-size: 15px;
+  }
+
+  .not-found {
+    color: #ff3b3b;
+    font-weight: bold;
+    margin-top: 20px;
+    text-shadow: 0 0 5px white;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+</head>
+<body>
+
+  <h1>Consulta de Países</h1>
+  <input type="text" id="search" placeholder="Escribe un país (Ej: Colombia)" />
+  <div id="result"></div>
+
+  <script>
+    const input = document.getElementById('search');
+    const resultDiv = document.getElementById('result');
+
+    input.addEventListener('input', () => {
+      const query = input.value.trim();
+      if (query.length < 2) {
+        resultDiv.innerHTML = '';
+        return;
+      }
+
+      fetch(`https://restcountries.com/v3.1/name/${query}`)
+        .then(res => {
+          if (!res.ok) throw new Error('País no encontrado');
+          return res.json();
+        })
+        .then(data => {
+          const country = data[0];
+          resultDiv.innerHTML = `
+            <div class="country-card">
+              <h2>${country.name.common}</h2>
+              <img src="${country.flags.svg}" alt="Bandera de ${country.name.common}">
+              <p><strong>Capital:</strong> ${country.capital}</p>
+              <p><strong>Región:</strong> ${country.region}</p>
+              <p><strong>Población:</strong> ${country.population.toLocaleString()}</p>
+            </div>
+          `;
+        })
+        .catch(() => {
+          resultDiv.innerHTML = '<p class="not-found">País no encontrado.</p>';
+        });
+    });
+  </script>
+
+</body>
+</html>
